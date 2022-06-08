@@ -74,7 +74,7 @@ def main():
         print('Specify source path and target directory!')
         exit(-1)
 
-    IS_TEST = (len(sys.argv[1:]) == 3 and sys.argv[3] == 'test')
+    IS_TEST = (len(sys.argv[1:]) == 3 and sys.argv[3] == '--test')
     print('is_test:', IS_TEST)
         
     source_path = sys.argv[1]
