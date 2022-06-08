@@ -3,9 +3,23 @@ import os
 import sys
 import subprocess
 import re
+from argparse import ArgumentParser
 import re_replace as rrep
 from consts import *
 from ReplaceImports import ReplaceImports
+
+
+def init_parser_args():
+    parser = ArgumentParser(description='Move python file and change imports')
+    parser.add_argument('-f', '--source-file', dest='file',
+                        help='Source file', metavar='filename')
+    parser.add_argument('-d', '--source-dir', dest='dir',
+                        help='Source directory', metavar='directory name')
+    parser.add_argument('-t', '--target-dir', dest='target_dir', required=True,
+                        help='Target directory', metavar='directory name')
+    parser.add_argument('--is-test', dest='is_test', action='store_true',
+                        help='Should be a test')
+    return parser.parse_args()
 
 
 def convert_to_python_path(string: str) -> str:
@@ -14,7 +28,7 @@ def convert_to_python_path(string: str) -> str:
 
 
 def search_files_grep(pattern) -> list[str]:
-    result = subprocess.run(['egrep', '-rl', './', '-e', pattern], stdout=subprocess.PIPE)
+    result = subprocess.run(['egrep', '-rl', './', '-e', pattern, '--include=*.py'], stdout=subprocess.PIPE)
     s = result.stdout.decode('utf-8')
     return s[:-1].split('\n')
 
@@ -69,15 +83,14 @@ def check_relative_imports_of_target(source_path: str) -> bool:
     return False
 
 
-def main():
-    if not (3 >= len(sys.argv[1:]) >= 2):
-        print('Specify source path and target directory!')
-        exit(-1)
+def get_files_of_dir(directory: str) -> list[str]:
+    """ Returns list of python filenames in the directory """
+    return [(directory + f) for f in os.listdir(
+        directory) if os.path.isfile(os.path.join(directory, f)) and '.py' == f[-3:]]
 
-    IS_TEST = (len(sys.argv[1:]) == 3 and sys.argv[3] == '--test')
-    print('is_test:', IS_TEST)
-        
-    source_path = sys.argv[1]
+
+def move_file(file, target_dir, is_test):
+    source_path = file
     source_python_import = convert_to_python_path(source_path)
     if check_relative_imports(source_python_import):
         print('There are relative imports of target file')
@@ -90,11 +103,11 @@ def main():
         exit(-1)
 
     # print(f'{source_python_import=}')
-    target_dir = add_slash_or_not(sys.argv[2])
     target_path = target_dir + source_path.split('/')[-1]
     target_python_import = convert_to_python_path(target_path)
-    print(f'{target_python_import=}')
+    print(f'-------\nTarget python import: {target_python_import}\n-------')
 
+    # exit()
 
     ''' Change imports '''
     regex_import = rrep.format_regex(IMPORT_PATTERN, source_python_import)
@@ -113,7 +126,7 @@ def main():
     check_intersection(found_usual_imports, found_as_imports, found_from_imports)
 
 
-    replace_imports = ReplaceImports(IS_TEST, target_python_import)
+    replace_imports = ReplaceImports(is_test, target_python_import)
 
     '''As-imports'''
     print('\nAs-imports:')
@@ -135,10 +148,35 @@ def main():
     )
 
     ''' Move file '''
-    if not IS_TEST:
+    if not is_test:
         os.rename(source_path, target_path)
 
 
+
+def main():
+    args = init_parser_args()
+    if not (3 >= len(sys.argv[1:]) >= 2):
+        print('Specify source path and target directory!')
+        exit(-1)
+
+    print(args)
+    IS_TEST = args.is_test
+    print('is_test:', IS_TEST)
+
+    if args.file is None and args.dir is None:
+        print('Specify source!')
+        exit()
+
+    target_dir = add_slash_or_not(args.target_dir)
+
+    if args.file is not None:
+        move_file(args.file, target_dir, IS_TEST)
+    elif args.dir is not None:
+        files = get_files_of_dir(args.dir)
+        print('Directory files:', files)
+        for file in files:
+            move_file(file, target_dir, IS_TEST)
+        
 if __name__ == '__main__':
     main()
 
