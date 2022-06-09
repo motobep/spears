@@ -96,8 +96,8 @@ def get_files_of_dir(directory: str) -> list[str]:
 
 def move_file(file, target_dir, is_test):
     source_path = file
-
-    if INIT_FILE == source_path[-len(INIT_FILE):]:
+    is_init_file = INIT_FILE == source_path[-len(INIT_FILE):]
+    if is_init_file:
         # Handle init file
         source_dir_path = get_directory(source_path)
         source_python_import = convert_to_python_path(source_dir_path)
@@ -118,7 +118,10 @@ def move_file(file, target_dir, is_test):
 
     # print(f'{source_python_import=}')
     target_path = target_dir + source_path.split('/')[-1]
-    target_python_import = convert_to_python_path(target_path)
+    if is_init_file:
+        target_python_import = convert_to_python_path(target_dir[:-1]) # remove /
+    else:
+        target_python_import = convert_to_python_path(target_path)
     print(f'-------\nTarget python import: {target_python_import}\n-------')
 
     # exit()

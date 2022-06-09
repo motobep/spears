@@ -4,6 +4,7 @@ from test1 import testx
 
 from  pack.module     import hi
 from  pack.module10     import hello
+from pack import hello
 
 from indicators import (
     # test,
