@@ -12,6 +12,9 @@ class ReplaceImports:
     def multichange(self, files: list[str], func_and_args_dicts: list[dict]):
         print(files)
         for filename in files:
+            if self.is_test:
+                print(f'<{filename}>:')
+
             with open(filename, 'r') as file:
               data = file.read()
 
@@ -28,8 +31,9 @@ class ReplaceImports:
                 continue
 
             if self.is_test:
-                print(f'<{filename}>:')
-                print(data)
+                ...
+                # print(f'<{filename}>:')
+                # print(data)
             else:
                 with open(filename, 'w') as file:
                   file.write(data)

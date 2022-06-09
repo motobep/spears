@@ -22,6 +22,11 @@ def init_parser_args():
     return parser.parse_args()
 
 
+def get_directory(path: str) -> str:
+    arr = path.split('/')[:-1]
+    return '/'.join(arr)
+
+
 def convert_to_python_path(string: str) -> str:
     s = string.split('.')[0].replace('.', '') # drop extension and delete trailing '.'
     return s.replace('/', '.')
@@ -91,7 +96,16 @@ def get_files_of_dir(directory: str) -> list[str]:
 
 def move_file(file, target_dir, is_test):
     source_path = file
-    source_python_import = convert_to_python_path(source_path)
+
+    if INIT_FILE == source_path[-len(INIT_FILE):]:
+        # Handle init file
+        source_dir_path = get_directory(source_path)
+        source_python_import = convert_to_python_path(source_dir_path)
+        print('Handling __init__.py')
+        print(f'{source_python_import=}')
+    else:
+        source_python_import = convert_to_python_path(source_path)
+
     if check_relative_imports(source_python_import):
         print('There are relative imports of target file')
         print('Aborting')
@@ -129,20 +143,20 @@ def move_file(file, target_dir, is_test):
     replace_imports = ReplaceImports(is_test, target_python_import)
 
     '''As-imports'''
-    print('\nAs-imports:')
+    print('\n\nAs-imports:')
     replace_imports.change(found_as_imports, 
         {'func': rrep.replace_as_import, 'args': [regex_as_import]},
     )
 
     '''Ordinary imports'''
-    print('\nUsual imports:')
+    print('\n\nUsual imports:')
     replace_imports.multichange(found_usual_imports, [
         {'func': rrep.replace_keyword_import, 'args': [regex_import]},
         {'func': rrep.replace_namespace_of_import, 'args': [regex_namespace_import, regex_in_string]},
     ])
 
     '''From imports'''
-    print('\nFrom-imports:')
+    print('\n\nFrom-imports:')
     replace_imports.change(found_from_imports, 
         {'func': rrep.replace_from_import, 'args': [regex_from_import]},
     )
@@ -159,7 +173,7 @@ def main():
         print('Specify source path and target directory!')
         exit(-1)
 
-    print(args)
+    # print(args)
     IS_TEST = args.is_test
     print('is_test:', IS_TEST)
 

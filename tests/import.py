@@ -1,4 +1,4 @@
-import os, subprocess,  test, sys
+import os, subprocess, dot.dot, test, sys
 import  pack.module
 import pack.module10
 
