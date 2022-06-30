@@ -1,5 +1,4 @@
-# from .hi.else import hi
-from hi.else import hi
+from not_existing.file import hi
 
 
 def test():
@@ -10,3 +9,4 @@ def test0():
 
 def test2():
     print('hi2')
+

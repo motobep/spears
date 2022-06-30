@@ -33,7 +33,7 @@ def convert_to_python_path(string: str) -> str:
 
 
 def search_files_grep(pattern) -> list[str]:
-    result = subprocess.run(['egrep', '-rl', './', '-e', pattern, '--include=*.py'], stdout=subprocess.PIPE)
+    result = subprocess.run(['egrep', '-rl', './', '-e', pattern, '--include=*.py', '--exclude-dir={env,venv,__pycache__}'], stdout=subprocess.PIPE)
     s = result.stdout.decode('utf-8')
     return s[:-1].split('\n')
 

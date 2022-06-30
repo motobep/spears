@@ -1,7 +1,7 @@
-import test as Test
+import moving_file as Test
 
-import  pack.module as m
-import pack.module10 as m10
+import  package.nested_moving_file as m
+import package.nested_moving_file2 as m10
 
 Test.test()
        '' Test.test()  w
