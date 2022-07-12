@@ -1,2 +1,8 @@
+/*
 **/__pycache__/**
+!consts.py
+!ReplaceImports.py
+!re_replace.py
+!spears.py
+!tests/
 

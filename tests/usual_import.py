@@ -1,12 +1,12 @@
-import os, subprocess, dot.dot, moving_file, sys
-import  package.nested_moving_file
-import package.nested_moving_file2
-import package as p
+import os, subprocess, dot.dot, target_dir.moving_file, sys
+import  target_dir.package.nested_moving_file
+import target_dir.package.nested_moving_file2
+import target_dir.package as p
 
-moving_file.test()
-       '' moving_file.test()  c
+target_dir.moving_file.test()
+       '' target_dir.moving_file.test()  c
 
-package.nested_moving_file.hi()
-package.nested_moving_file2.hello()
+target_dir.package.nested_moving_file.hi()
+target_dir.package.nested_moving_file2.hello()
 p.nested_moving_file.hi()
 
